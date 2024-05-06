@@ -28,12 +28,8 @@ public:
     }
 
     void add_vertex(const Vertex& v) {
-        auto it = std::find(_vertices.begin(), _vertices.end(), v);
-        if (it != _vertices.end())
-            return false;
-        _vertices.push_back(v);
-        _edges[v] = {};
-        return true;
+        if (!has_vertex(v))
+            _vertices.push_back(v);
     }
 
     bool remove_vertex(const Vertex& v) {
@@ -56,12 +52,9 @@ public:
 
     //проверка-добавление-удаление ребер
     void add_edge(const Vertex& from, const Vertex& to,const Distance& d) {
-        if (!has_vertex(from))
-            add_vertex(from);
-        if (!has_vertex(to))
-            add_vertex(to);
-        if (!has_edge(from, to)) 
-            _edges[from].push_back(Edge{ from, to, d });
+        if (!has_vertex(from) || !has_vertex(to))
+            return;
+        _edges[from].push_back({ from, to, d });
     }
 
     bool remove_edge(const Vertex& from, const Vertex& to);
@@ -90,15 +83,51 @@ public:
     } //c учетом расстояния в Edge
 
     //получение всех ребер, выходящих из вершины
-    std::vector<Edge> edges(const Vertex& vertex);
+    std::vector<Edge> edges(const Vertex& vertex) {
+        auto it = std::find(_vertices.begin(), _vertices.end(), vertex);
+        if (it == _vertices.end())
+            return {};
+        auto edges_it = _edges.find(vertex);
+        if (edges_it == _edges.end())
+            return {};
+        return edges_it->second;
+    }
 
-    size_t order() const; //порядок 
-    size_t degree(const Vertex& v) const; //степень вершины
+    size_t order() const {
+        return _vertices.size();
+    }
+
+    size_t degree(const Vertex& v) const {
+        auto it = std::find(_vertices.begin(), _vertices.end(), v);
+        if (it == _vertices.end())
+            return 0;
+        auto edges_it = _edges.find(v);
+        if (edges_it == _edges.end())
+            return 0;
+        return edges_it->second.size();
+    } //степень вершины
 
 
     //поиск кратчайшего пути
-    std::vector<Edge> shortest_path(const Vertex& from,
-        const Vertex& to) const;
+    std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
+        std::unordered_map<Vertex, Distance> distances;
+        std::unordered_map<Vertex, Vertex> predecessors;
+        for (const auto& v : _vertices) {
+            distances[v] = std::numeric_limits<Distance>::max();
+        }
+        distances[from] = 0;
+
+        for (size_t i = 0; i < _vertices.size() - 1; ++i) {
+            for (const auto& [v, edges] : _edges) {
+                for (const auto& edge : edges) {
+                    if (distances[edge.from] + edge.weight < distances[edge.to]) {
+                        distances[edge.to] = distances[edge.from] + edge.weight;
+                        predecessors[edge.to] = edge.from;
+                    }
+                }
+            }
+        }
+    }
     //обход
     std::vector<Vertex>  walk(const Vertex& start_vertex)const;
 };
