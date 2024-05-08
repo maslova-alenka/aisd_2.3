@@ -9,27 +9,29 @@
 #include <vector>
 #include <unordered_map>
 
+#define EPSILON 1e-10
+#define INFINITY 1e9
+
+
 template<typename Vertex, typename Distance = double>
 class Graph {
-private:
-    std::vector<Vertex> _vertices;
-    std::unordered_map<Vertex, std::vector<Edge>> _edges;
 public:
     struct Edge {
         Vertex to;
         Vertex from;
         Distance distance;
-    }
-
-
+    };
     //проверка-добавление-удаление вершин
     bool has_vertex(const Vertex& v) const {
         return std::find(_vertices.begin(), _vertices.end(), v) != _vertices.end();
     }
 
     void add_vertex(const Vertex& v) {
-        if (!has_vertex(v))
-            _vertices.push_back(v);
+        /*if (!has_vertex(v))
+            _vertices.push_back(v);*/
+        if (has_vertex(v)) throw std::invalid_argument("[add_vertex] the vertex already exists");
+        _vertices.push_back(v);
+        _edges[v] = { };
     }
 
     bool remove_vertex(const Vertex& v) {
@@ -58,7 +60,7 @@ public:
     }
 
     bool remove_edge(const Vertex& from, const Vertex& to);
-    bool remove_edge(const Edge& e)//c учетом расстояния
+    bool remove_edge(const Edge& e);//c учетом расстояния
 
     bool has_edge(const Vertex& from, const Vertex& to) const {
         if (std::find(_vertices.begin(), _vertices.end(), from) == _vertices.end())
@@ -113,7 +115,7 @@ public:
         std::unordered_map<Vertex, Distance> distances;
         std::unordered_map<Vertex, Vertex> predecessors;
         for (const auto& v : _vertices) {
-            distances[v] = std::numeric_limits<Distance>::max();
+            distances[v] = INFINITY;
         }
         distances[from] = 0;
 
@@ -128,8 +130,22 @@ public:
             }
         }
     }
+
+    void print() const {
+        for (auto& v : _vertices) {
+            std::cout << v << " : ";
+            for (auto& e : _edges.at(v)) {
+                std::cout << "(" << e.to << ", " << e.distance << "),  ";
+            }
+            std::cout << std::endl;
+        }
+    }
     //обход
     std::vector<Vertex>  walk(const Vertex& start_vertex)const;
+
+    private:
+        std::vector<Vertex> _vertices;
+        std::unordered_map<Vertex, std::vector<Edge>> _edges;
 };
 
 
