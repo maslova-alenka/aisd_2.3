@@ -18,8 +18,8 @@ template<typename Vertex, typename Distance = double>
 class Graph {
 public:
     struct Edge {
-        Vertex to;
         Vertex from;
+        Vertex to;
         Distance distance;
     };
 
@@ -86,10 +86,12 @@ public:
     }
 
     bool has_edge(const Vertex& from, const Vertex& to) const {
-        for (const auto& edge : _edges)
-        {
-            if (edge.from == from && edge.to == to)
-                return true;
+        for (const auto& edges : _edges) {
+            for (const auto& edge : edges.second) {
+                if (edge.from == from && edge.to == to) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -115,17 +117,19 @@ public:
 
     size_t degree(const Vertex& v) const {
         size_t count = 0;
-        for (auto& edge : _edges)
-        {
-            if (edge._from == v || edge._to == v)
-                count++;
+        for (const auto& edges : _edges) {
+            for (const auto& edge : edges.second) {
+                if (edge.from == v || edge.to == v) {
+                    count++;
+                }
+            }
         }
         return count;
     } //степень вершины
 
 
     //поиск кратчайшего пути
-    std::vector<Edge> shortest_path(const Vertex& to, const Vertex& from) const {
+    std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
         if (!has_vertex(to) || !has_vertex(from)) 
             throw std::invalid_argument("error in shortest_path");
         std::unordered_map<Vertex, Distance> distances;
@@ -167,6 +171,8 @@ public:
         return path;
     }
 
+
+
     void print() const {
         for (auto& v : _vertices) {
             std::cout << v << " : ";
@@ -176,66 +182,35 @@ public:
             std::cout << std::endl;
         }
     }
-    //обход
-    /*void walk(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const {
-        if (!has_vertex(start_vertex))
-            throw std::invalid_argument("start_vertex not found");
 
-        std::vector<Vertex> visited;
-        std::vector<size_t> dist(_vertices.size(), 0);
-        std::stack<Vertex> stack;
+  
 
-        stack.push(start_vertex);
-        visited.push_back(start_vertex);
-        dist[std::find(_vertices.begin(), _vertices.end(), start_vertex) - _vertices.begin()] = 0;
-        action(start_vertex);
-
-        while (!stack.empty()) {
-            Vertex current = stack.top();
-            stack.pop();
-
-            for (const auto& edge : _edges.at(current)) {
-                size_t index = std::find(_vertices.begin(), _vertices.end(), edge.to) - _vertices.begin();
-                if (std::find(visited.begin(), visited.end(), edge.to) == visited.end()) {
-                    stack.push(edge.to);
-                    visited.push_back(edge.to);
-                    dist[index] = dist[std::find(_vertices.begin(), _vertices.end(), current) - _vertices.begin()] + 1;
-                    action(edge.to);
-                }
+    void print_edges() const {
+        std::cout << "Edges: " << std::endl;
+        for (const Vertex& vertex : _vertices) {
+            for (const Edge& edge : _edges.at(vertex)) {
+                std::cout << edge.from << " -> " << edge.to << "(" << edge.distance << ")" << std::endl;
             }
         }
-    }*/
+    }
 
+    //обход
     void walk(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const {
         if (!has_vertex(start_vertex))
             throw std::invalid_argument("start_vertex not found");
 
         std::vector<Vertex> visited;
-        std::vector<size_t> dist(_vertices.size(), 0);
+        std::vector<size_t> dist(_vertices.size(), false);
         std::stack<Vertex> stack;
 
+        dist[start_vertex] = true;
         stack.push(start_vertex);
-        visited.push_back(start_vertex);
-        dist[std::find(_vertices.begin(), _vertices.end(), start_vertex) - _vertices.begin()] = 0;
         action(start_vertex);
-
-        std::cout << "Start vertex: " << start_vertex << std::endl;
-        std::cout << "Visited: ";
-        for (const auto& v : visited) {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "Distances: ";
-        for (const auto& d : dist) {
-            std::cout << d << " ";
-        }
-        std::cout << std::endl;
+        visited.push_back(start_vertex);
 
         while (!stack.empty()) {
             Vertex current = stack.top();
             stack.pop();
-
-            std::cout << "Popped vertex: " << current << std::endl;
 
             for (const auto& edge : _edges.at(current)) {
                 size_t index = std::find(_vertices.begin(), _vertices.end(), edge.to) - _vertices.begin();
@@ -244,34 +219,10 @@ public:
                     visited.push_back(edge.to);
                     dist[index] = dist[std::find(_vertices.begin(), _vertices.end(), current) - _vertices.begin()] + 1;
                     action(edge.to);
-
-                    std::cout << "Pushed vertex: " << edge.to << std::endl;
-                    std::cout << "Visited: ";
-                    for (const auto& v : visited) {
-                        std::cout << v << " ";
-                    }
-                    std::cout << std::endl;
-                    std::cout << "Distances: ";
-                    for (const auto& d : dist) {
-                        std::cout << d << " ";
-                    }
-                    std::cout << std::endl;
                 }
             }
         }
-
-        std::cout << "Последовательность вершин: ";
-        for (const auto& v : visited) {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;
     }
-
-
-
-
-
-
 };
 
 
