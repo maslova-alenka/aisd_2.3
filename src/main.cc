@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/graph.h"
+#include "../include/task.h"
 
 int main() {
     // Create a graph with integer vertices
@@ -20,7 +20,7 @@ int main() {
     graph.add_edge(5, 4, 5);
 
     std::cout << "Graph:\n";
-    graph.print();
+    //graph.print();
     graph.print_edges();
 
     std::cout << "The degree of the vertex 4: " << graph.degree(4) << std::endl;
@@ -46,10 +46,15 @@ int main() {
     graph.remove_vertex(1);
     graph.remove_vertex(4);
 
-    graph.print();
+    graph.print_edges();
+
+   // graph.print();
 
     std::cout << "An edge 5->4 is present in graph: " << graph.has_edge(5, 4) << std::endl;
     std::cout << "An vertex 1 is present in graph: " << graph.has_vertex(1) << std::endl;
+
+    int warehouse_location = find_warehouse_location(graph);
+    std::cout << "Warehouse location: " << warehouse_location << std::endl;
 
 
 
