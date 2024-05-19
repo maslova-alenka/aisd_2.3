@@ -129,46 +129,43 @@ public:
 
 
     //поиск кратчайшего пути
-    std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
-        if (!has_vertex(to) || !has_vertex(from)) 
-            throw std::invalid_argument("error in shortest_path");
-        std::unordered_map<Vertex, Distance> distances;
-        std::unordered_map<Vertex, Vertex> predecessors;
-        for (const auto& v : _vertices) {
-            distances[v] = INFINITY;
-        }
-        distances[to] = 0;
+    std::vector<Edge> shortest_path(const Vertex& start, const Vertex& end) const {
+        if (!has_vertex(start) || !has_vertex(end)) throw std::invalid_argument("error in shortest_path");
 
-        for (size_t i = 0; i < _vertices.size() - 1; ++i) {
-            for (const auto& [v, edges] : _edges) {
+        std::unordered_map<Vertex, Distance> distance;
+        std::unordered_map<Vertex, Vertex> predecessors;
+
+        for (const Vertex& vertex : _vertices) {
+            distance[vertex] = INFINITY;
+        }
+        distance[start] = 0;
+
+        for (size_t i = 0; i < _vertices.size(); ++i) {
+            for (const auto& [from, edges] : _edges) {
                 for (const auto& edge : edges) {
-                    if (distances[edge.from] + edge.distance < distances[edge.to]) {
-                        distances[edge.to] = distances[edge.from] + edge.distance;
+                    if (distance[from] + edge.distance < distance[edge.to]) {
+                        distance[edge.to] = distance[from] + edge.distance;
                         predecessors[edge.to] = edge.from;
                     }
                 }
             }
         }
-        // Проверка на наличие отрицательных циклов
-        for (const auto& [v, edges] : _edges) {
+        for (const auto& [from, edges] : _edges) {
             for (const auto& edge : edges) {
-                if (distances[edge.from] + edge.distance < distances[edge.to]) {
+                if (distance[from] + edge.distance < distance[edge.to])
                     throw std::runtime_error("Negative cycle detected");
-                }
             }
         }
-
-        // Формирование пути от стартовой вершины до целевой вершины
-        std::vector<Vertex> path;
-        Vertex current = from;
-        while (current != to) {
-            path.push_back(current);
+        std::vector<Edge> result;
+        Vertex current = end;
+        while (current != start) {
+            auto it = std::find_if(_edges.at(predecessors[current]).begin(), _edges.at(predecessors[current]).end(), [&](const Edge& e) { return e.to == current; });
+            result.push_back(*it);
             current = predecessors[current];
         }
-        path.push_back(to);
-        std::reverse(path.begin(), path.end());
+        std::reverse(result.begin(), result.end());
 
-        return path;
+        return result;
     }
 
 
