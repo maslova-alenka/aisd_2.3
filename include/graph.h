@@ -35,7 +35,7 @@ public:
     }
 
     void add_vertex(const Vertex& v) {
-        if (has_vertex(v)) 
+        if (has_vertex(v))
             throw std::invalid_argument("add_vertex");
         _vertices.push_back(v);
         _edges[v] = { };
@@ -54,13 +54,12 @@ public:
         return true;
     }
 
-    /*std::vector<Vertex> vertices() const {
+    std::vector<Vertex> vertices() const {
         return _vertices;
-    }*/
-    Vertex find_warehouse_location(Graph<Vertex, Distance>& g);
+    }
 
     //проверка-добавление-удаление ребер
-    void add_edge(const Vertex& from, const Vertex& to,const Distance& d) {
+    void add_edge(const Vertex& from, const Vertex& to, const Distance& d) {
         if (!has_vertex(from) || !has_vertex(to))
             return;
         _edges[from].push_back({ from, to, d });
@@ -105,11 +104,11 @@ public:
     }
 
     //получение всех ребер, выход€щих из вершины
-    /*std::vector<Edge> edges(const Vertex& vertex) {
+    std::vector<Edge> edges(const Vertex& vertex) {
         if (!has_vertex(vertex))
             throw std::invalid_argument("vertex is not found");
         return _edges[vertex];
-    }*/
+    }
 
     size_t order() const {
         return _vertices.size();
@@ -129,227 +128,56 @@ public:
 
 
 
-    //std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
-    //    if (!has_vertex(from) || !has_vertex(to))
-    //        return {};
-
-    //    std::unordered_map<Vertex, Distance> distances;
-    //    std::unordered_map<Vertex, Vertex> prev;
-
-    //    for (const auto& vertex : _vertices)
-    //        distances[vertex] = INFIN;
-    //    distances[from] = 0;
-
-    //    for (size_t i = 0; i < _vertices.size() - 1; ++i) {
-    //        for (const auto& vertex : _vertices) {
-    //            for (const auto& edge : _edges.at(vertex)) {
-    //                if (distances[vertex] + edge.distance < distances[edge.to]) {
-    //                    distances[edge.to] = distances[vertex] + edge.distance;
-    //                    prev[edge.to] = vertex;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    // ѕроверка наличи€ циклов отрицательного веса
-    //    for (const auto& vertex : _vertices) {
-    //        for (const auto& edge : _edges.at(vertex)) {
-    //            if (distances[vertex] + edge.distance < distances[edge.to]) {
-    //                throw std::runtime_error("Negative cycle detected");
-    //            }
-    //        }
-    //    }
-
-    //    // ¬осстановление кратчайшего пути
-    //    std::vector<Edge> path;
-    //    Vertex current = to;
-    //    while (current != from) {
-    //        for (const auto& edge : _edges.at(prev[current])) {
-    //            if (edge.to == current) {
-    //                path.push_back(edge);
-    //                break;
-    //            }
-    //        }
-    //        current = prev[current];
-    //    }
-    //    std::reverse(path.begin(), path.end());
-
-    //    return path;
-    //}
-
-    std::vector<Edge> exiting_edges(const Vertex& v) const {
-        if (!has_vertex(v))
-            throw std::invalid_argument("Vertex not found");
-        return _edges.at(v);
-    }
-
-    std::pair<typename std::vector<Vertex>::iterator, typename std::vector<Vertex>::iterator> vertices() {
-        return { _vertices.begin(), _vertices.end() };
-    }
-
-    std::pair<typename std::vector<Vertex>::iterator, typename std::vector<Vertex>::iterator> edges(const Vertex& v) {
-        return { exiting_edges(v).begin(), exiting_edges(v).end() };
-    }
-
-    //std::vector<Edge> shortest_path(const Vertex& start, const Vertex& end) const {
-    //    if (!has_vertex(start) || !has_vertex(end)) {
-    //        return {};
-    //    }
-
-    //    std::unordered_map<Vertex, Distance> distance;
-    //    std::unordered_map<Vertex, Vertex> prev;
-
-    //    for (const Vertex& vertex : _vertices) {
-    //        distance[vertex] = std::numeric_limits<Distance>::max();
-    //    }
-    //    distance[start] = 0;
-
-    //    for (size_t i = 0; i < _vertices.size() - 1; ++i) {
-    //        for (const auto& [from, edges] : _edges) {
-    //            for (const auto& edge : edges) {
-    //                if (distance[from] + edge.distance < distance[edge.to]) {
-    //                    distance[edge.to] = distance[from] + edge.distance;
-    //                    prev[edge.to] = edge.from;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    // ѕроверка наличи€ циклов отрицательного веса
-    //    for (const auto& [from, edges] : _edges) {
-    //        for (const auto& edge : edges) {
-    //            if (distance[from] + edge.distance < distance[edge.to]) {
-    //                throw std::runtime_error("[shortest_path] the graph contains a negative cycle");
-    //            }
-    //        }
-    //    }
-
-    //    std::vector<Edge> result;
-    //    Vertex current = end;
-    //    while (current != start) {
-    //        auto it_from = _edges.find(prev[current]);
-    //        if (it_from != _edges.end()) {
-    //            auto it = std::find_if(it_from->second.begin(), it_from->second.end(), [&](const Edge& e) { return e.to == current; });
-    //            if (it != it_from->second.end()) {
-    //                result.push_back(*it);
-    //            }
-    //        }
-    //        current = prev[current];
-    //    }
-    //    std::reverse(result.begin(), result.end());
-
-    //    return result;
-    //}
-
-    std::vector<Edge>shortest_path(const Vertex& start, const Vertex& end) const {
-        if (!has_vertex(start) || !has_vertex(end)) {
+    std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
+        if (!has_vertex(from) || !has_vertex(to))
             return {};
-        }
 
-        std::unordered_map<Vertex, Distance> distance;
+        std::unordered_map<Vertex, Distance> distances;
         std::unordered_map<Vertex, Vertex> prev;
 
-        for (const Vertex& vertex : _vertices) {
-            distance[vertex] = std::numeric_limits<Distance>::max();
-        }
-        distance[start] = 0;
+        for (const auto& vertex : _vertices)
+            distances[vertex] = INFIN;
+        distances[from] = 0;
 
         for (size_t i = 0; i < _vertices.size() - 1; ++i) {
-            for (const auto& [from, edges] : _edges) {
-                for (const auto& edge : edges) {
-                    if (distance[from] + edge.distance < distance[edge.to]) {
-                        distance[edge.to] = distance[from] + edge.distance;
-                        prev[edge.to] = from;
+            for (const auto& vertex : _vertices) {
+                for (const auto& edge : _edges.at(vertex)) {
+                    if (distances[vertex] + edge.distance < distances[edge.to]) {
+                        distances[edge.to] = distances[vertex] + edge.distance;
+                        prev[edge.to] = vertex;
                     }
                 }
             }
         }
 
-        // ѕроверка наличи€ циклов отрицательного веса
-        for (const auto& [from, edges] : _edges) {
-            for (const auto& edge : edges) {
-                if (distance[from] + edge.distance < distance[edge.to]) {
-                    throw std::runtime_error("[shortest_path] the graph contains a negative cycle");
+        for (const auto& vertex : _vertices) {
+            for (const auto& edge : _edges.at(vertex)) {
+                if (distances[vertex] + edge.distance < distances[edge.to]) {
+                    throw std::runtime_error("Negative cycle detected");
                 }
             }
         }
 
-        std::vector<typename Graph<Vertex, Distance>::Edge> result;
-        Vertex current = end;
-        while (current != start) {
-            result.emplace_back(prev[current], current, distance[current] - distance[prev[current]]);
+        std::vector<Edge> path;
+        Vertex current = to;
+        while (current != from) {
+            for (const auto& edge : _edges.at(prev[current])) {
+                if (edge.to == current) {
+                    path.push_back(edge);
+                    break;
+                }
+            }
             current = prev[current];
         }
-        std::reverse(result.begin(), result.end());
+        std::reverse(path.begin(), path.end());
 
-        return result;
+        return path;
     }
 
 
-  
-    //std::vector <Edge> shortest_path(const Vertex& start, const Vertex& end) const {
-    //    if (!has_vertex(start) || !has_vertex(end)) throw std::invalid_argument("[shortest_path] one or two vertices do not exist in the graph");
-
-    //    std::unordered_map<Vertex, Distance> distance;
-
-    //    for (const Vertex& vertex : _vertices) {
-    //        distance[vertex] = std::numeric_limits<Distance>::max();
-    //    }
-    //    distance[start] = 0;
-
-    //    std::unordered_map<Vertex, Vertex> prev;
-
-    //    for (size_t i = 0; i < _vertices.size(); ++i) {
-    //        for (const auto& [from, edges] : _edges) {
-    //            for (const auto& edge : edges) {
-    //                if (distance[from] + edge.distance < distance[edge.to]) {
-    //                    distance[edge.to] = distance[from] + edge.distance;
-    //                    prev[edge.to] = edge.from;
-    //                }
-    //            }
-    //        }
-    //    }
-    //    for (const auto& [from, edges] : _edges) {
-    //        for (const auto& edge : edges) {
-    //            if (distance[from] + edge.distance < distance[edge.to])
-    //                throw std::runtime_error("[shortest_path] the graph contains a negative cycle");
-    //        }
-    //    }
-    //    std::vector<Edge> result;
-    //    Vertex current = end;
-    //    while (current != start) {
-    //        auto it = std::find_if(_edges.at(prev[current]).begin(), _edges.at(prev[current]).end(), [&](const Edge& e) { return e.to == current; });
-    //        result.push_back(*it);
-    //        current = prev[current];
-    //    }
-    //    std::reverse(result.begin(), result.end());
-
-    //    return result;
-    //}
+    Vertex find_warehouse_location();
 
 
-    Distance length_shortest_path(const Vertex& start, const Vertex& end) {
-        std::vector<Edge> edges = shortest_path(start, end);
-        Distance len = 0;
-        for (const auto& edge : edges) {
-            len += edge.distance;
-        }
-        return len;
-    }
-  
-
-
-    //void print() const {
-    //    for (auto& v : _vertices) {
-    //        std::cout << v << " : ";
-    //        for (auto& e : _edges.at(v)) {
-    //            std::cout << "(" << e.to << ", " << e.distance << "),  ";
-    //        }
-    //        std::cout << std::endl;
-    //    }
-    //}
-
-  
 
     void print_edges() const {
         std::cout << "Edges: " << std::endl;
