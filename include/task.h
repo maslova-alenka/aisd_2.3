@@ -7,7 +7,7 @@
 template<typename Vertex, typename Distance>
 Vertex Graph<Vertex, Distance>::find_warehouse_location() {
     Vertex best_location;
-    Distance min_total_distance = std::numeric_limits<Distance>::max();
+    Distance min_total_distance =INFIN;
     bool is_achievable = false;
 
     for (const auto& v : vertices()) {

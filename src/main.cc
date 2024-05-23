@@ -37,8 +37,8 @@ int main() {
     graph.walk(1, [](const int vertex) {std::cout << vertex << " "; });
     
     std::cout << std::endl;
-    auto path = graph.shortest_path(1, 4);
-    std::cout << "Shortest path from 1 to 2: ";
+    auto path = graph.shortest_path(1, 5);
+    std::cout << "Shortest path from 1 to 5: ";
     for (const auto& edge : path) {
         std::cout << edge.from << " -> " << edge.to << " (" << edge.distance << ") ";
     }

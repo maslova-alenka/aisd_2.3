@@ -66,7 +66,8 @@ public:
     }
 
     bool remove_edge(const Vertex& from, const Vertex& to) {
-        if (!has_edge(from, to)) return false;
+        if (!has_edge(from, to)) 
+            return false;
         auto& edges = _edges.at(from);
 
         edges.erase(std::remove_if(edges.begin(), edges.end(), [&](const Edge& e) { return (e.from == from) && (e.to == to); }), edges.end());
@@ -75,7 +76,8 @@ public:
     }
 
     bool remove_edge(const Edge& e) {
-        if (!has_edge(e)) return false;
+        if (!has_edge(e)) 
+            return false;
         auto& edges = _edges.at(e.from);
 
         edges.erase(std::remove_if(edges.begin(), edges.end(), [e](const Edge& edge)
