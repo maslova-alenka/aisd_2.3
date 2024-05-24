@@ -33,8 +33,15 @@ int main() {
         std::cout << v << " ";
     }
     std::cout << std::endl;
+    //std::cout << "Graph traversal: ";
+    //graph.walk(1, [](const int vertex) {std::cout << vertex << " "; });
+
     std::cout << "Graph traversal: ";
-    graph.walk(1, [](const int vertex) {std::cout << vertex << " "; });
+    std::vector<int> visited;
+    graph.walk(1, [&visited](const int vertex) { visited.push_back(vertex); });
+    for (int v : visited)
+        std::cout << v << " ";
+    std::cout << std::endl;
     
     std::cout << std::endl;
     auto path = graph.shortest_path(1, 5);
